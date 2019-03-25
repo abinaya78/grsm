@@ -181,7 +181,7 @@ class StateMachine(State):
             is_valid = False
         else:
             for d in self.__transitions:                
-                if d['source'] == transition['source'] and d['target'] == transition['targer']:
+                if d['source'] == transition['source'] and d['target'] == transition['target']:
                     is_valid = False
                     break
         return is_valid
@@ -219,10 +219,12 @@ class StateMachine(State):
 
         attach_method = self.__create_method()
 
-        setattr(self, transition['trigger'], abstractmethod(attach_method))
+        setattr(self, transition['trigger'], attach_method)
                
         
+
     def on_error_state(self):
         self.current_state = 'error'
         self.state_lock = True
+        
         
