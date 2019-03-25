@@ -166,10 +166,13 @@ class StateMachine(State):
     def transition_lock(self):
         return self.__transition_lock
     
-    @transition_lock.setter(self, value):
+    @transition_lock.setter:
+    def transition_lock(self, value):    
         if self.__transition_lock == False:
             self.__transition_lock = True
             
+    def set_transition_lock(self):
+        self.transition_lock = True
 
     def is_transistion_valid(self, transition):
         is_valid = True
