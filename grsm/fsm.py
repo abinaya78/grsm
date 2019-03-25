@@ -44,6 +44,7 @@ class StateMachine(State):
         self.__triggers = set()
         self.__current_state = None
         self.__state_lock = False
+        self.__transition_lock = False
         self.__set_default_states()
         self.__create_states()
 
@@ -160,6 +161,15 @@ class StateMachine(State):
             self.__state_lock = True
         else:
             self.__state_lock = False
+            
+    @property
+    def transition_lock(self):
+        return self.__transition_lock
+    
+    @transition_lock.setter(self, value):
+        if self.__transition_lock == False:
+            self.__transition_lock = True
+            
 
     def is_transistion_valid(self, transition):
         is_valid = True
@@ -180,6 +190,9 @@ class StateMachine(State):
         return is_valid
 
     def add_transition(self, trigger='', source='', target='', on_enter='', on_exit='', on_process=''):
+        
+        assert (self.transition_lock == False), 'No more Transisitons'
+        
         params = locals().copy()
 
         assert (self.is_transistion_valid(params) == True), 'Transition already exists'
