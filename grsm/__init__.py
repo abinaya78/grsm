@@ -1,1 +1,1 @@
-from .fsm import  Machine
+from .fsm import StateMachine
