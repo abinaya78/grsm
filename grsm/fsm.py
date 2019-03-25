@@ -130,6 +130,7 @@ class StateMachine(State):
                 getattr(self, transition_list[0]['on_exit'])()
 
         return method_template
+       
 
     @property
     def current_state(self):
@@ -176,20 +177,13 @@ class StateMachine(State):
 
     def is_transistion_valid(self, transition):
         is_valid = True
-        tt = self.__get_transition_template()
-        for tk in tt.keys():
-            if tk == 'source':
-                continue
-            for d in self.__transitions:
-                if transition[tk] != '' and transition[tk] in list(d.values()):
-                    print(tk)
+        if any( transition['trigger'] in d['trigger'] for d in self.__transitions ):
+            is_valid = False
+        else:
+            for d in self.__transitions:                
+                if d['source'] == transition['source'] and d['target'] == transition['targer']:
                     is_valid = False
                     break
-
-            if is_valid == False:
-                break
-        else:
-            is_valid = True
         return is_valid
 
     def add_transition(self, trigger='', source='', target='', on_enter='', on_exit='', on_process=''):
@@ -211,22 +205,24 @@ class StateMachine(State):
             transition[obj] = locals()[obj]
 
         if on_enter != '':
-            assert (on_enter in method_list), 'Invalid on enter method or not implemented'
+            assert (on_enter in method_list), 'Method {} not implemented'.format(on_enter)
 
         if on_process != '':
-            assert (on_process in method_list), 'Invalid on process method or not implemented'
+            assert (on_process in method_list), 'Method {} not implemented'.format(on_process)
         else:
-            assert (), 'Empty process function'
+            assert (), 'on_process cannot be EMPTY'
 
         if on_exit != '':
-            assert (on_exit in method_list), 'Invalid on exit method or not implemented'
+            assert (on_exit in method_list), 'Method {} not implemented'.format(on_exit)
 
         self.__transitions.append(transition)
 
         attach_method = self.__create_method()
 
-        setattr(self, transition['trigger'], attach_method)
-
+        setattr(self, transition['trigger'], abstractmethod(attach_method))
+               
+        
     def on_error_state(self):
         self.current_state = 'error'
         self.state_lock = True
+        
